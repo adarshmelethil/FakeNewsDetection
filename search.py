@@ -1,10 +1,8 @@
 import json
-import gensim.downloader as api
 from gensim import similarities
 from gensim.models import TfidfModel
 from gensim.corpora import Dictionary
 import spacy
-import copy
 from sample_docs import docs
 
 def get_sents(text):
