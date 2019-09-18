@@ -78,6 +78,11 @@ def search(query, text, nlp, threshold):
 
     return [ res for res in results if res['relevance'] > threshold]
 
+def search_multiple_docs(query, docs, nlp, threshold):
+    text = '\n\n'.join(docs)
+    return search(query, text=text, nlp=nlp, threshold=threshold)
+
+
 def print_results(results):
     for res in results:
         print(json.dumps(res,indent=4))
@@ -86,8 +91,7 @@ def main():
     nlp = spacy.load("en_core_web_sm")
 
     query = '''Women take drastic measures to prevent rape'''
-    text = '\n\n'.join(docs)
-    results = search(query=query, text=text, nlp=nlp, threshold=0.0)
+    results = search_multiple_docs(query=query, docs=docs, nlp=nlp, threshold=0.0)
     print_results(results)
 
 if __name__ == '__main__':
