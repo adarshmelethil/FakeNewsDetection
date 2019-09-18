@@ -4,7 +4,7 @@ from gensim import similarities
 from gensim.models import TfidfModel
 from gensim.corpora import Dictionary
 import spacy
-from sample_docs import docs
+from .raw_data import docs
 
 def get_sents(text):
     return [tokenize(sent) for sent in list(text.sents)]
@@ -95,7 +95,7 @@ def print_results(results):
         print(json.dumps(res,indent=4))
 
 def main():
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_lg")
     query = '''Women take drastic measures to prevent rape'''
     results = search_multiple_docs(query=query, docs=docs, nlp=nlp, threshold=0.0)
     print_results(results)
