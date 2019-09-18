@@ -1,4 +1,5 @@
 import json
+from gensim.models.phrases import Phrases, Phraser
 from gensim import similarities
 from gensim.models import TfidfModel
 from gensim.corpora import Dictionary
@@ -14,7 +15,7 @@ def tokenize(text):
         tokens.append(word)
     return tokens
 
-def preprocess(segments, dct=None):
+def preprocess(segments, dct=None, bigram=None):
     processed_segments = []
     for seg in segments:
         processed_seg = []
@@ -25,24 +26,32 @@ def preprocess(segments, dct=None):
             word = word.lower()
             processed_seg.append(word)
         processed_segments.append(processed_seg)
+
+    if bigram is None:
+        phrases = Phrases(processed_segments, min_count=3, threshold=3)  # train model
+        bigram = Phraser(phrases)  # construct faster model (this is only an wrapper)
+
+    processed_segments = bigram[processed_segments]
+
     if dct is None:
         dct = Dictionary(processed_segments)
     else:
         dct.add_documents(processed_segments)
-    return [dct.doc2bow(line) for line in processed_segments], dct, processed_segments
 
-def preprocess_query(query, nlp, dct):
+    return [dct.doc2bow(line) for line in processed_segments], dct, processed_segments, bigram
+
+def preprocess_query(query, nlp, dct, bigram):
     query = nlp(query)
     query = tokenize(text=query)
-    query, dct, processed_segments= preprocess(segments=[query], dct=dct)
+    query, dct, processed_segments, bigram = preprocess(segments=[query], dct=dct, bigram=bigram)
     query = query[0]
     return query
 
 def preprocess_text(text, nlp, dct=None):
     text = nlp(text)
     segments = get_sents(text=text)
-    bag_of_words, dct, processed_segments = preprocess(segments=segments, dct=dct)
-    return segments, dct, bag_of_words, processed_segments
+    bag_of_words, dct, processed_segments, bigram = preprocess(segments=segments, dct=dct)
+    return segments, dct, bag_of_words, processed_segments, bigram
 
 def get_original(segments):
     return [' '.join([word.text for word in seg]) for seg in segments]
@@ -61,9 +70,9 @@ def tfidf_search(query, segments, segments_original, dct, bag_of_words, nlp):
     return results
 
 def search(query, text, nlp, threshold):
-    segments, dct, bag_of_words, processed_segments = preprocess_text(text=text, nlp=nlp)
+    segments, dct, bag_of_words, processed_segments, bigram = preprocess_text(text=text, nlp=nlp)
     segments_original = get_original(segments=segments)
-    query = preprocess_query(query=query, nlp=nlp, dct=dct)
+    query = preprocess_query(query=query, nlp=nlp, dct=dct, bigram=bigram)
     
     results = tfidf_search(
                 query=query,
@@ -87,7 +96,6 @@ def print_results(results):
 
 def main():
     nlp = spacy.load("en_core_web_sm")
-
     query = '''Women take drastic measures to prevent rape'''
     results = search_multiple_docs(query=query, docs=docs, nlp=nlp, threshold=0.0)
     print_results(results)
