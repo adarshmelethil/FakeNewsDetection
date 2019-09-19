@@ -12,6 +12,7 @@ setup(
     "spacy",
     "regex",
     "gensim",
+    "torch",
   ],
   entry_points = {
     'console_scripts': [
