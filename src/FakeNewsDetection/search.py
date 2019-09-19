@@ -4,7 +4,7 @@ from gensim import similarities
 from gensim.models import TfidfModel
 from gensim.corpora import Dictionary
 import spacy
-from sample_docs import docs
+from .raw_data import docs
 
 def get_sents(text):
     return [tokenize(sent) for sent in list(text.sents)]

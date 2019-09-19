@@ -1,6 +1,6 @@
 
 import torch
-import data
+from .raw_data import getTestData
 
 roberta = torch.hub.load('pytorch/fairseq', 'roberta.large.mnli')
 roberta.eval()  # disable dropout (or leave in train mode to finetune)
@@ -20,8 +20,9 @@ def timeCompareText(func, *args, **kwargs):
   end = time.time()
   return end - start, resp
 
-if __name__ == "__main__":
-  test_data = data.getTestData()
+
+def main():
+  test_data = getTestData()
 
   counter = [0, 0]
   mistakes = {}
@@ -50,3 +51,6 @@ if __name__ == "__main__":
     print(f"h: {mistake['h']}")
     print(f"actual: {numToEntailment[mistake['entailment']]}, predicted: {numToEntailment[mistake['predicted']]}")
     print("-"*80)
+
+if __name__ == "__main__":
+  main()
