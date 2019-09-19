@@ -28,8 +28,8 @@ def preprocess(segments, dct=None, bigram=None):
         processed_segments.append(processed_seg)
 
     if bigram is None:
-        phrases = Phrases(processed_segments, min_count=3, threshold=3)  # train model
-        bigram = Phraser(phrases)  # construct faster model (this is only an wrapper)
+        phrases = Phrases(processed_segments, min_count=3, threshold=3) 
+        bigram = Phraser(phrases)
 
     processed_segments = bigram[processed_segments]
 
@@ -54,7 +54,7 @@ def preprocess_text(text, nlp, dct=None):
     return segments, dct, bag_of_words, processed_segments, bigram
 
 def get_original(segments):
-    return [' '.join([word.text for word in seg]) for seg in segments]
+    return [' '.join([word.text.strip() for word in seg]) for seg in segments]
 
 def tfidf_search(query, segments, segments_original, dct, bag_of_words, nlp):
     tfidf = TfidfModel(bag_of_words)
@@ -96,8 +96,8 @@ def print_results(results):
 
 def main():
     nlp = spacy.load("en_core_web_sm")
-    query = '''Women take drastic measures to prevent rape'''
-    results = search_multiple_docs(query=query, docs=docs, nlp=nlp, threshold=0.0)
+    query = '''human rights watch says that women are not denined justice'''
+    results = search_multiple_docs(query=query, docs=docs, nlp=nlp, threshold=0.1)
     print_results(results)
 
 if __name__ == '__main__':
