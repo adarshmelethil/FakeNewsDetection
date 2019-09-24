@@ -10,7 +10,7 @@ setup(
   include_package_data=True,
   install_requires=[
     "spacy",
-    "regex",
+    "regex==2017.4.5",
     "gensim",
     "torch",
   ],
